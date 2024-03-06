@@ -21,6 +21,8 @@ add the API token to the [secrets of the Github repository](https://docs.github.
 
 ## Installation and Usage (Local)
 
+make sure you set `BASEROW_TOKEN`, `BASEROW_USER` and `BASEROW_PW` as environment variables
+
 ```bash
 python -m venv venv # create a virtual environment
 source venv/bin/activate # activate the virtual environment
