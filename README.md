@@ -15,8 +15,8 @@ It creates the following tables:
 
 * Login to Baserow and create a new workspace for a project.
 * Then [create a new API token in Baserow](https://baserow.io/user-docs/personal-api-tokens).
-* Clone this repository and add the API token to the [secrets of the Github repository](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-development-environment-secrets-for-your-repository-or-organization) as `BASEROW_TOKEN`. Add more secrets for the user as `BASEROW_USER` and password as `BASEROW_PW`.
-* Then create a new workflow file in the `.github/workflows` directory and copy the content of the `update_baserow.yml` file. Then push the changes to the repository.
+* Clone this repository and either delete the `.git` folder and initialize new git repo or change the origin to your needs; you can also fork the repo.
+add the API token to the [secrets of the Github repository](https://docs.github.com/en/codespaces/managing-codespaces-for-your-organization/managing-development-environment-secrets-for-your-repository-or-organization) as `BASEROW_TOKEN`. Add more secrets for the user as `BASEROW_USER` and password as `BASEROW_PW`.
 * [Trigger the workflow manually](https://docs.github.com/en/actions/using-workflows/manually-running-a-workflow) and add the Baserow Datebase ID of the database in your Baserow workspace in the required Github Actions Input field.
 
 ## Installation and Usage (Local)
