@@ -15,12 +15,12 @@ os.makedirs(output_folder, exist_ok=True)
 
 if isinstance(BASEROW_DB_ID, str) or isinstance(BASEROW_DB_ID, int) and BASEROW_DB_ID != 0:
     print("Downloading data from Baserow...")
-    files = br_client.dump_tables_as_json(BASEROW_DB_ID, folder_name="json_dumps", indent=2)
+    files = br_client.dump_tables_as_json(BASEROW_DB_ID, folder_name=output_folder, indent=2)
     print("Data downloaded.")
 
     print("Denormalizing data...")
-    denormalize_json("Project", "json_dumps", MAPPING_PROJECT)
-    denormalize_json("Persons", "json_dumps", MAPPING_PERSONS)
-    denormalize_json("Organizations", "json_dumps", MAPPING_ORGS)
-    denormalize_json("Places", "json_dumps", MAPPING_PLACES)
+    denormalize_json("Project", output_folder, MAPPING_PROJECT)
+    denormalize_json("Persons", output_folder, MAPPING_PERSONS)
+    denormalize_json("Organizations", output_folder, MAPPING_ORGS)
+    denormalize_json("Places", output_folder, MAPPING_PLACES)
     print("Data denormalized.")
