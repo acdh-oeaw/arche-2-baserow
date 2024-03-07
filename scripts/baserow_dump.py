@@ -1,3 +1,4 @@
+import os
 from config import (
     br_client,
     BASEROW_DB_ID,
@@ -8,6 +9,9 @@ from config import (
 )
 from utils.denormalize import denormalize_json
 
+
+output_folder = "json_dumps"
+os.makedirs(output_folder, exist_ok=True)
 
 if isinstance(BASEROW_DB_ID, str) or isinstance(BASEROW_DB_ID, int) and BASEROW_DB_ID != 0:
     print("Downloading data from Baserow...")
