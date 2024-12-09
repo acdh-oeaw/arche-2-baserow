@@ -1,5 +1,13 @@
 import json
-from config import (jwt_token, BASEROW_DB_ID)
+from time import sleep
+from config import (jwt_token,
+                    BASEROW_DB_ID,
+                    PROJECT,
+                    TOPCOLLECTION,
+                    COLLECTION,
+                    RESOURCE,
+                    METADATA,
+                    PUBLICATION)
 from utils.baserow import (create_database_table, update_table_field_types, update_table_rows_batch, delete_table_field)
 
 vocabs_files = {
@@ -26,6 +34,7 @@ with open("out/Vocabs.json", "w") as f:
 # create table
 vocabs = create_database_table(BASEROW_DB_ID, jwt_token, "Vocabs", merged_table)
 print("Vocabs uploaded to Baserow...")
+sleep(1)
 
 # load json files with classes and properites
 with open("out/properties_default.json", "r") as f:
@@ -35,11 +44,17 @@ with open("out/classes_default.json", "r") as f:
 
 # create tables
 classes = create_database_table(BASEROW_DB_ID, jwt_token, "Classes", classes_table)
+sleep(1)
 properties = create_database_table(BASEROW_DB_ID, jwt_token, "Properties", properties_table)
+sleep(1)
 persons = create_database_table(BASEROW_DB_ID, jwt_token, "Persons")
+sleep(1)
 places = create_database_table(BASEROW_DB_ID, jwt_token, "Places")
+sleep(1)
 organizations = create_database_table(BASEROW_DB_ID, jwt_token, "Organizations")
+sleep(1)
 project = create_database_table(BASEROW_DB_ID, jwt_token, "Project", "Subject_uri")
+sleep(1)
 print(classes)
 print(properties)
 print(persons)
@@ -72,6 +87,7 @@ classes_fields = update_table_field_types(
     jwt_token,
     default_fields
 )
+sleep(1)
 
 # properties table fields
 default_fields = [
@@ -90,6 +106,7 @@ properties_fields = update_table_field_types(
     jwt_token,
     default_fields
 )
+sleep(1)
 
 # persons table fields
 default_fields = [
@@ -110,7 +127,9 @@ persons_fields = update_table_field_types(
     jwt_token,
     default_fields
 )
+sleep(1)
 delete_table_field(persons["id"], jwt_token, ["Notes", "Active"])
+sleep(1)
 
 # places table fields
 default_fields = [
@@ -125,7 +144,9 @@ places_fields = update_table_field_types(
     jwt_token,
     default_fields
 )
+sleep(1)
 delete_table_field(places["id"], jwt_token, ["Notes", "Active"])
+sleep(1)
 
 # organizations table fields
 default_fields = [
@@ -140,7 +161,9 @@ organizations_fields = update_table_field_types(
     jwt_token,
     default_fields
 )
+sleep(1)
 delete_table_field(organizations["id"], jwt_token, ["Notes", "Active"])
+sleep(1)
 
 # project table fields
 default_fields = [
@@ -178,207 +201,78 @@ project_fields = update_table_field_types(
     jwt_token,
     default_fields
 )
+sleep(1)
 delete_table_field(project["id"], jwt_token, ["Notes", "Active"])
+sleep(1)
 
 # Upading Baserow table rows
 with open("out/properties.json", "r") as f:
-    properties = json.load(f)
+    properties: list[dict] = json.load(f)
 with open("out/classes.json", "r") as f:
-    classes = json.load(f)
+    classes: list[dict] = json.load(f)
 
 update_table_rows_batch(properties_table, properties)
+sleep(5)
 update_table_rows_batch(class_table, classes)
+sleep(5)
 
-project_properties = [
-    "hasTitle",
-    "hasDescription",
-    "hasContact",
-    "hasMetadataCreator",
-    "hasRelatedDiscipline",
-    "hasSubject",
-    "hasRelatedCollection"
-]
-topCol_properties = [
-    "hasTitle",
-    "hasDescription",
-    "hasContact",
-    "hasMetadataCreator",
-    "hasRelatedDiscipline",
-    "hasSubject",
-    "hasOwner",
-    "hasRightsHolder",
-    "hasLicensor",
-    "hasDepositor",
-    "hasCurator"
-]
-collection_properties = [
-    "hasTitle",
-    "hasMetadataCreator",
-    "hasRelatedDiscipline",
-    "hasOwner",
-    "hasRightsHolder",
-    "hasLicensor",
-    "hasDepositor"
-]
-resource_properties = [
-    "hasTitle",
-    "hasMetadataCreator",
-    "hasRelatedDiscipline",
-    "hasOwner",
-    "hasRightsHolder",
-    "hasLicensor",
-    "hasDepositor",
-    "hasLicense",
-    "hasCategory",
-    "isPartOf"
-]
-metadata_properties = [
-    "hasTitle",
-    "hasMetadataCreator",
-    "hasOwner",
-    "hasRightsHolder",
-    "hasLicensor",
-    "hasDepositor",
-    "hasLicense",
-    "hasCategory"
-]
-publication_properties = [
-    "hasTitle"
-]
-# Create Initial Project Template
+BASEROW_PROJECT_TABLE = {
+    "Project": PROJECT,
+    "TopCollection": TOPCOLLECTION,
+    "Collection": COLLECTION,
+    "Resource": RESOURCE,
+    "Metadata": METADATA,
+    "Publication": PUBLICATION
+}
+
+
+def get_properties(class_name: str):
+    return BASEROW_PROJECT_TABLE[class_name]
+
+
+def create_id_list(list: list[dict], name: str):
+    domain = "https://vocabs.acdh.oeaw.ac.at/schema#"
+    return [x["id"] for x in list if x["Name"] == name and x["Namespace"] == domain]
+
+
+def create_template_lists(ids: int,
+                          custom_properties: list[str],
+                          classes_name: str,
+                          default_properties: list[dict],
+                          default_classes: list[dict]):
+    template = []
+    for prop in custom_properties:
+        print(f"Creating {prop} template...")
+        template.append({
+            "id": ids,
+            "order": f"{ids}.00000000000000000000",
+            "Subject_uri": f"enter-{classes_name}-uri",
+            "Class": create_id_list(default_classes, classes_name),
+            "Predicate_uri": create_id_list(default_properties, prop),
+            "Object_uri_persons": [],
+            "Object_uri_places": [],
+            "Object_uri_organizations": [],
+            "Object_uri_resource": [],
+            "Object_uri_vocabs": [],
+            "Literal": "",
+            "Language": "",
+            "Date": None,
+            "Number": None,
+            "Inherit": []
+        })
+        ids += 1
+    return ids, template
+
+
+# create template lists
 ids = 1
-project_template = []
-for prop in project_properties:
-    project_template.append({
-        "id": ids,
-        "order": f"{ ids }.00000000000000000000",
-        "Subject_uri": "your-project",
-        "Class": [x["id"] for x in classes if x["Name"] == "Project" and
-                  x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Predicate_uri": [x["id"] for x in properties if x["Name"] == prop and
-                          x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Object_uri_persons": [],
-        "Object_uri_places": [],
-        "Object_uri_organizations": [],
-        "Object_uri_resource": [],
-        "Literal": None,
-        "Language": None,
-        "Date": None,
-        "Number": None,
-        "Inherit": []
-    })
-    ids += 1
-topCol_template = []
-for prop in topCol_properties:
-    topCol_template.append({
-        "id": ids,
-        "order": f"{ ids }.00000000000000000000",
-        "Subject_uri": "your-top-collection",
-        "Class": [x["id"] for x in classes if x["Name"] == "TopCollection" and
-                  x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Predicate_uri": [x["id"] for x in properties if x["Name"] == prop and
-                          x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Object_uri_persons": [],
-        "Object_uri_places": [],
-        "Object_uri_organizations": [],
-        "Object_uri_resource": [],
-        "Literal": None,
-        "Language": None,
-        "Date": None,
-        "Number": None,
-        "Inherit": []
-    })
-    ids += 1
-collection_template = []
-for prop in collection_properties:
-    collection_template.append({
-        "id": ids,
-        "order": f"{ ids }.00000000000000000000",
-        "Subject_uri": "your-collection",
-        "Class": [x["id"] for x in classes if x["Name"] == "Collection" and
-                  x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Predicate_uri": [x["id"] for x in properties if x["Name"] == prop and
-                          x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Object_uri_persons": [],
-        "Object_uri_places": [],
-        "Object_uri_organizations": [],
-        "Object_uri_resource": [],
-        "Literal": None,
-        "Language": None,
-        "Date": None,
-        "Number": None,
-        "Inherit": []
-    })
-    ids += 1
-resource_template = []
-for prop in resource_properties:
-    resource_template.append({
-        "id": ids,
-        "order": f"{ ids }.00000000000000000000",
-        "Subject_uri": "your-resource",
-        "Class": [x["id"] for x in classes if x["Name"] == "Resource" and
-                  x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Predicate_uri": [x["id"] for x in properties if x["Name"] == prop and
-                          x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Object_uri_persons": [],
-        "Object_uri_places": [],
-        "Object_uri_organizations": [],
-        "Object_uri_resource": [],
-        "Literal": None,
-        "Language": None,
-        "Date": None,
-        "Number": None,
-        "Inherit": []
-    })
-    ids += 1
-metadata_template = []
-for prop in metadata_properties:
-    metadata_template.append({
-        "id": ids,
-        "order": f"{ ids }.00000000000000000000",
-        "Subject_uri": "your-metadata",
-        "Class": [x["id"] for x in classes if x["Name"] == "Metadata" and
-                  x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Predicate_uri": [x["id"] for x in properties if x["Name"] == prop and
-                          x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Object_uri_persons": [],
-        "Object_uri_places": [],
-        "Object_uri_organizations": [],
-        "Object_uri_resource": [],
-        "Literal": None,
-        "Language": None,
-        "Date": None,
-        "Number": None,
-        "Inherit": []
-    })
-    ids += 1
-publication_template = []
-for prop in publication_properties:
-    metadata_template.append({
-        "id": ids,
-        "order": f"{ ids }.00000000000000000000",
-        "Subject_uri": "your-publication",
-        "Class": [x["id"] for x in classes if x["Name"] == "Publication" and
-                  x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Predicate_uri": [x["id"] for x in properties if x["Name"] == prop and
-                          x["Namespace"] == "https://vocabs.acdh.oeaw.ac.at/schema#"],
-        "Object_uri_persons": [],
-        "Object_uri_places": [],
-        "Object_uri_organizations": [],
-        "Object_uri_resource": [],
-        "Literal": None,
-        "Language": None,
-        "Date": None,
-        "Number": None,
-        "Inherit": []
-    })
-    ids += 1
-
-print(f"Updating {ids} Project table rows...")
-update_table_rows_batch(project["id"], project_template)
-update_table_rows_batch(project["id"], topCol_template)
-update_table_rows_batch(project["id"], collection_template)
-update_table_rows_batch(project["id"], resource_template)
-update_table_rows_batch(project["id"], metadata_template)
-update_table_rows_batch(project["id"], publication_template)
+for key, value in BASEROW_PROJECT_TABLE.items():
+    print(f"Updating {key} table rows...")
+    ids_update, custom_template_project = create_template_lists(ids, get_properties(key), key, properties, classes)
+    ids = ids_update
+    # with open(f"out/{key}.json", "w") as f:
+    #     json.dump(custom_template_project, f, indent=2)
+    update_table_rows_batch(project["id"],
+                            custom_template_project)
+    sleep(5)
 print("Done...")

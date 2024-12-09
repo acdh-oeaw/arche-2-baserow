@@ -43,7 +43,7 @@ def update_table_rows(br_table_id: int, table: dict) -> None:
             print(f"{e} with {row_id}")
 
 
-def update_table_rows_batch(br_table_id: int, table: dict) -> None:
+def update_table_rows_batch(br_table_id: int, table: list[dict]) -> None:
     """Batch updating a Baserow table with a dictionary of rows.
     Baserow table id and dictionary of rows are required."""
     br_rows_url = f"{BASEROW_URL}database/rows/table/{br_table_id}/batch/"
@@ -67,18 +67,21 @@ def update_table_rows_batch(br_table_id: int, table: dict) -> None:
             print(f"Error {r.status_code}")
             print("Row does not exist. Creating...")
             print(url)
-            r = requests.post(
-                url,
-                headers={
-                    "Authorization": f"Token {BASEROW_TOKEN}",
-                    "Content-Type": "application/json"
-                },
-                json=items
-            )
-            if r.status_code == 200:
-                print("Created")
-            else:
-                print(f"Error {r.status_code}")
+            try:
+                r = requests.post(
+                    url,
+                    headers={
+                        "Authorization": f"Token {BASEROW_TOKEN}",
+                        "Content-Type": "application/json"
+                    },
+                    json=items
+                )
+                if r.status_code == 200:
+                    print("Created")
+                else:
+                    print(f"Error {r.status_code}")
+            except Exception as e:
+                print(e)
     except Exception as e:
         print(e)
 
@@ -106,7 +109,7 @@ def create_database_table(
     else:
         table["first_row_header"] = True
         table["data"] = [[table_values]]
-    print("Creating table... ", br_db_url)
+    print("Creating table... ", table_name, " ", br_db_url)
     r = requests.post(
         br_db_url,
         headers={
@@ -132,7 +135,7 @@ def update_table_field_types(
     """Upading Baserow table field types. Baserow table id, JWT token, default fields and"""
     br_table_url = f"{BASEROW_URL}database/fields/table/{table_id}/"
     for x in tqdm(default_fields, total=len(default_fields)):
-        print("Updating table... ", br_table_url)
+        print("Updating table field types... ", br_table_url)
         r = requests.patch(
             br_table_url,
             headers={

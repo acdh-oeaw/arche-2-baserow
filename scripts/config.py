@@ -57,3 +57,62 @@ LANG_SPECIAL_TOKEN = "na"
 # Baserow client and jwt_token
 br_client = BaseRowClient(BASEROW_USER, BASEROW_PW, BASEROW_TOKEN, br_base_url=BASEROW_URL)
 jwt_token = br_client.get_jwt_token()
+
+# Baserow Project table template
+
+PROJECT = [
+    "hasTitle",
+    "hasDescription",
+    "hasContact",
+    "hasMetadataCreator",
+    "hasRelatedDiscipline",
+    "hasSubject",
+    "hasRelatedCollection"
+]
+TOPCOLLECTION = [
+    "hasTitle",
+    "hasDescription",
+    "hasContact",
+    "hasMetadataCreator",
+    "hasRelatedDiscipline",
+    "hasSubject",
+    "hasOwner",
+    "hasRightsHolder",
+    "hasLicensor",
+    "hasDepositor",
+    "hasCurator"
+]
+COLLECTION = [
+    "hasTitle",
+    "hasMetadataCreator",
+    "hasRelatedDiscipline",
+    "hasOwner",
+    "hasRightsHolder",
+    "hasLicensor",
+    "hasDepositor"
+]
+RESOURCE = [
+    "hasTitle",
+    "hasMetadataCreator",
+    "hasRelatedDiscipline",
+    "hasOwner",
+    "hasRightsHolder",
+    "hasLicensor",
+    "hasDepositor",
+    "hasLicense",
+    "hasCategory",
+    "isPartOf"
+]
+METADATA = [
+    "hasTitle",
+    "hasMetadataCreator",
+    "hasOwner",
+    "hasRightsHolder",
+    "hasLicensor",
+    "hasDepositor",
+    "hasLicense",
+    "hasCategory"
+]
+PUBLICATION = [
+    "hasTitle"
+]
