@@ -82,7 +82,7 @@ def create_baserow_json(input: list, xpath_l, xpath_c) -> tuple[dict, dict]:
         dict_id = baserow_dict_id[about]
         baserow_dict.append({
             "id": dict_id,
-            "order": f"{ dict_id }.00000000000000000000",
+            "order": f"{dict_id}.00000000000000000000",
             "Name": about_key,
             "Namespace": ns,
             "Label": label,
