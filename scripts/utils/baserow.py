@@ -199,3 +199,41 @@ def delete_table_field(
     else:
         print(f"Error {r.status_code} with {table_id}")
         return r.json()
+
+
+def get_properties(template: dict[str, list[str]], class_name: str):
+    return template[class_name]
+
+
+def create_id_list(list: list[dict], name: str):
+    domain = "https://vocabs.acdh.oeaw.ac.at/schema#"
+    return [x["id"] for x in list if x["Name"] == name and x["Namespace"] == domain]
+
+
+def create_template_lists(ids: int,
+                          custom_properties: list[str],
+                          classes_name: str,
+                          default_properties: list[dict],
+                          default_classes: list[dict]):
+    template = []
+    for prop in custom_properties:
+        print(f"Creating {prop} template...")
+        template.append({
+            "id": ids,
+            "order": f"{ids}.00000000000000000000",
+            "Subject_uri": f"enter-{classes_name}-uri",
+            "Class": create_id_list(default_classes, classes_name),
+            "Predicate_uri": create_id_list(default_properties, prop),
+            "Object_uri_persons": [],
+            "Object_uri_places": [],
+            "Object_uri_organizations": [],
+            "Object_uri_resource": [],
+            "Object_uri_vocabs": [],
+            "Literal": "",
+            "Language": "",
+            "Date": None,
+            "Number": None,
+            "Inherit": []
+        })
+        ids += 1
+    return ids, template

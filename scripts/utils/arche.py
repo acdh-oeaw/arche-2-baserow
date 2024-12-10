@@ -16,6 +16,8 @@ def parse_rdf_xml(url) -> ET.ElementTree:
         ET.register_namespace(prefix, uri)
     p = ET.XMLParser(huge_tree=True)
     response = requests.get(url)
+    if response.status_code != 200:
+        raise Exception(f"Error: {response.status_code}")
     tree = ET.fromstring(response.content, parser=p)
     print("tree parsed")
     return tree

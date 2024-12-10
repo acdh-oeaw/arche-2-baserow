@@ -1,14 +1,13 @@
 import json
 from time import sleep
-from config import (jwt_token,
-                    BASEROW_DB_ID,
-                    PROJECT,
-                    TOPCOLLECTION,
-                    COLLECTION,
-                    RESOURCE,
-                    METADATA,
-                    PUBLICATION)
-from utils.baserow import (create_database_table, update_table_field_types, update_table_rows_batch, delete_table_field)
+from config import (jwt_token, BASEROW_DB_ID)
+from template import BASEROW_PROJECT_TABLE
+from utils.baserow import (create_database_table,
+                           update_table_field_types,
+                           update_table_rows_batch,
+                           delete_table_field,
+                           create_template_lists,
+                           get_properties)
 
 vocabs_files = {
     "vocabs_categories": "out/archecategory.json",
@@ -212,67 +211,21 @@ with open("out/classes.json", "r") as f:
     classes: list[dict] = json.load(f)
 
 update_table_rows_batch(properties_table, properties)
-sleep(5)
+sleep(3)
 update_table_rows_batch(class_table, classes)
-sleep(5)
-
-BASEROW_PROJECT_TABLE = {
-    "Project": PROJECT,
-    "TopCollection": TOPCOLLECTION,
-    "Collection": COLLECTION,
-    "Resource": RESOURCE,
-    "Metadata": METADATA,
-    "Publication": PUBLICATION
-}
-
-
-def get_properties(class_name: str):
-    return BASEROW_PROJECT_TABLE[class_name]
-
-
-def create_id_list(list: list[dict], name: str):
-    domain = "https://vocabs.acdh.oeaw.ac.at/schema#"
-    return [x["id"] for x in list if x["Name"] == name and x["Namespace"] == domain]
-
-
-def create_template_lists(ids: int,
-                          custom_properties: list[str],
-                          classes_name: str,
-                          default_properties: list[dict],
-                          default_classes: list[dict]):
-    template = []
-    for prop in custom_properties:
-        print(f"Creating {prop} template...")
-        template.append({
-            "id": ids,
-            "order": f"{ids}.00000000000000000000",
-            "Subject_uri": f"enter-{classes_name}-uri",
-            "Class": create_id_list(default_classes, classes_name),
-            "Predicate_uri": create_id_list(default_properties, prop),
-            "Object_uri_persons": [],
-            "Object_uri_places": [],
-            "Object_uri_organizations": [],
-            "Object_uri_resource": [],
-            "Object_uri_vocabs": [],
-            "Literal": "",
-            "Language": "",
-            "Date": None,
-            "Number": None,
-            "Inherit": []
-        })
-        ids += 1
-    return ids, template
-
+sleep(3)
 
 # create template lists
 ids = 1
 for key, value in BASEROW_PROJECT_TABLE.items():
     print(f"Updating {key} table rows...")
-    ids_update, custom_template_project = create_template_lists(ids, get_properties(key), key, properties, classes)
+    ids_update, custom_template_project = create_template_lists(ids,
+                                                                get_properties(BASEROW_PROJECT_TABLE, key),
+                                                                key, properties, classes)
     ids = ids_update
     # with open(f"out/{key}.json", "w") as f:
     #     json.dump(custom_template_project, f, indent=2)
     update_table_rows_batch(project["id"],
                             custom_template_project)
-    sleep(5)
+    sleep(3)
 print("Done...")
